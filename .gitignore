@@ -1,0 +1,12 @@
+*.mem
+*.cpu
+*.test
+*.log
+*.out
+*.coverprofile
+cover.html
+coverage.txt
+coverage.out
+*.pprof
+.idea/
+bin/
