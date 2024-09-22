@@ -8,24 +8,25 @@ import (
 	"net/http"
 )
 
+// HTTPClient interface for standard http-client to perform requests.
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-type Client struct {
-	baseUrl string
+type client struct {
+	baseURL string
 	client  HTTPClient
 }
 
-func NewClient(baseUrl string, client HTTPClient) *Client {
-	return &Client{
-		baseUrl: baseUrl,
-		client:  client,
+func newClient(baseURL string, httpClient HTTPClient) *client {
+	return &client{
+		baseURL: baseURL,
+		client:  httpClient,
 	}
 }
 
-func (c *Client) doRequest(ctx context.Context, method, url string, body io.Reader, response any) error {
-	req, err := http.NewRequestWithContext(ctx, method, c.baseUrl+url, body)
+func (c *client) doRequest(ctx context.Context, method, url string, body io.Reader, response any) error {
+	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+url, body)
 	if err != nil {
 		return fmt.Errorf("failed to build request: %w", err)
 	}
