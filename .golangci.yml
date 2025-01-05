@@ -1,0 +1,90 @@
+output:
+  # Make output more digestible with quickfix in vim/emacs/etc.
+  sort-results: true
+#  print-issued-lines: false
+
+linters:
+  # We'll track the golangci-lint default linters manually
+  # instead of letting them change without our control.
+  disable-all: true
+  enable:
+    # golangci-lint defaults:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+
+    # Our own extras:
+    - bodyclose
+    - copyloopvar
+    - errname
+    - errorlint
+    - exhaustive
+    - gofmt
+    - goimports
+    - goprintffuncname
+    - gosec
+    - mirror
+    - misspell
+    - nestif
+    - nilnil
+    - nolintlint
+    - nosprintfhostport
+    - revive
+    - unconvert
+    - wastedassign
+    - whitespace
+
+linters-settings:
+  govet:
+    # These govet checks are disabled by default, but they're useful.
+    enable:
+      - nilness
+      - reflectvaluecompare
+      - shadow
+      - sortslice
+      - unusedwrite
+  exhaustive:
+    default-signifies-exhaustive: true
+
+issues:
+  # Print all issues reported by all linters.
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+  # Don't ignore some of the issues that golangci-lint considers okay.
+  # This includes documenting all exported entities.
+  exclude-use-default: false
+
+  exclude-rules:
+    # Don't warn on unused parameters.
+    # Parameter names are useful; replacing them with '_' is undesirable.
+    - linters: [revive]
+      text: 'unused-parameter: parameter \S+ seems to be unused, consider removing or renaming it as _'
+
+    # staticcheck already has smarter checks for empty blocks.
+    # revive's empty-block linter has false positives.
+    # For example, as of writing this, the following is not allowed.
+    #   for foo() { }
+    - linters: [revive]
+      text: 'empty-block: this block is empty, you can remove it'
+
+    # It's okay if internal packages and examples in docs/
+    # don't have package comments.
+    - linters: [revive]
+#      path: '.+/internal/.+|^internal/.+|^docs/.+'
+      text: 'should have a package comment'
+
+    # It's okay for tests to use dot imports.
+    - linters: [revive]
+      path: '_test\.go$'
+      text: 'should not use dot imports'
+
+    # EXC0001 errcheck: Almost all programs ignore errors on these functions and in most cases it's ok
+    - linters: [errcheck]
+      text: 'return value of .((os\.)?std(out|err)\..*|.*Close|.*Flush|os\.Remove(All)?|.*print(f|ln)?|os\.(Un)?Setenv). is not checked'
+
+    - linters: [errcheck]
+      text: 'should check returned error before deferring'
